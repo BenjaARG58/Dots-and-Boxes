@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "279819232706",
+    "project_id": "mobilfinal-68f71",
+    "storage_bucket": "mobilfinal-68f71.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:279819232706:android:1ccf666299228d4930625b",
+        "android_client_info": {
+          "package_name": "com.kutukapmaca.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBQ0b0U3rE1ZI9jxyZ-6i1MPhxFReQ9BVY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

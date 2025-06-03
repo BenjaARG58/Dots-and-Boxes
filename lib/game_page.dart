@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'app_drawer.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class HomePage extends StatefulWidget {
+class GamePage extends StatefulWidget {
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<GamePage> createState() => _GamePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _GamePageState extends State<GamePage> {
   final int gridSize = 5;
 
   late List<List<int?>> horizontalLines;
@@ -47,6 +49,23 @@ class _HomePageState extends State<HomePage> {
     return true;
   }
 
+  void saveScoreToSupabase(String scoreText) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    final response = await Supabase.instance.client.from('scores').insert({
+      'user_id': user.uid,
+      'score_text': scoreText,
+      'created_at': DateTime.now().toIso8601String(),
+    });
+
+    if (response.error != null) {
+      print("Hata: \${response.error!.message}");
+    } else {
+      print("Skor kaydedildi");
+    }
+  }
+
   void drawLine({required bool isHorizontal, required int row, required int col}) {
     setState(() {
       if (isHorizontal) {
@@ -77,6 +96,11 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (!claimedBox) currentPlayer = 1 - currentPlayer;
+
+      if (isGameOver()) {
+        String scoreText = "\${scores[0]}-\${scores[1]}";
+        saveScoreToSupabase(scoreText);
+      }
     });
   }
 
@@ -84,9 +108,9 @@ class _HomePageState extends State<HomePage> {
     Color color = dotColor;
     if (isGameOver()) {
       if (scores[0] > scores[1]) {
-        color = playerColors[0]; // Mavi
+        color = playerColors[0];
       } else if (scores[1] > scores[0]) {
-        color = playerColors[1]; // Pembe
+        color = playerColors[1];
       }
     }
 

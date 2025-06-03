@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'login_page.dart';
 
 class AppDrawer extends StatelessWidget {
+  const AppDrawer({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -16,9 +20,9 @@ class AppDrawer extends StatelessWidget {
                 future: _fetchLogoUrl(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator(color: Colors.white);
+                    return const CircularProgressIndicator(color: Colors.white);
                   } else if (snapshot.hasError) {
-                    return Text('Logo yüklenemedi', style: TextStyle(color: Colors.white));
+                    return const Text('Logo yüklenemedi', style: TextStyle(color: Colors.white));
                   } else {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(12),
@@ -34,6 +38,7 @@ class AppDrawer extends StatelessWidget {
               ),
             ),
           ),
+
           Expanded(
             child: ListView(
               children: [
@@ -49,17 +54,41 @@ class AppDrawer extends StatelessWidget {
                   label: 'Nasıl Oynanır',
                   route: '/howtoplay',
                 ),
-
+                _buildDrawerItem(
+                  context,
+                  icon: Icons.person,
+                  label: 'Profil',
+                  route: '/profile',
+                ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
+
+          const Divider(color: Colors.white24),
+
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.redAccent),
+            title: const Text(
+              'Çıkış Yap',
+              style: TextStyle(color: Colors.white),
+            ),
+            onTap: () async {
+              await FirebaseAuth.instance.signOut();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+                    (route) => false,
+              );
+            },
+          ),
+
+          const Padding(
+            padding: EdgeInsets.all(12.0),
             child: Text(
               '© Berşan Kurtcephe',
               style: TextStyle(color: Colors.white54, fontSize: 12),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -71,7 +100,7 @@ class AppDrawer extends StatelessWidget {
       leading: Icon(icon, color: Colors.lightBlueAccent),
       title: Text(
         label,
-        style: TextStyle(color: Colors.white, fontSize: 16),
+        style: const TextStyle(color: Colors.white, fontSize: 16),
       ),
       hoverColor: Colors.lightBlueAccent.withOpacity(0.1),
       onTap: () {
@@ -81,8 +110,7 @@ class AppDrawer extends StatelessWidget {
   }
 
   Future<String> _fetchLogoUrl() async {
-    await Future.delayed(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 500));
     return 'https://i.imgur.com/1hwwXl0.png';
-
   }
 }

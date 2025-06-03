@@ -20,6 +20,7 @@ android {
     }
 
     defaultConfig {
+        applicationId "com.example.kutukapmaca" // Firebase'e tanımladığın package name
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.untitled"
         // You can update the following values to match your application needs.
@@ -42,3 +43,13 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:32.2.2')
+    implementation 'com.google.firebase:firebase-auth'
+    // Eğer Firestore veya diğer servisleri kullanacaksan, bunlar da eklenir:
+    // implementation 'com.google.firebase:firebase-firestore'
+    // implementation 'com.google.firebase:firebase-analytics'
+}
+
+apply plugin: 'com.google.gms.google-services'
