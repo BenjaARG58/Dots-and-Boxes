@@ -147,6 +147,7 @@ Flutter’ın layout yapıları (Column, Row, Expanded, ListView) kullanılarak 
   "birthplace": "Malatya",
   "city": "İstanbul",
   "createdAt": "2025-04-07T10:07:34Z"
+  "password": "123456"
 }
 ```
 
