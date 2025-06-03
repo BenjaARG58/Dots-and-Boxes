@@ -1,59 +1,139 @@
-# Kutu Kapmaca - Flutter Oyunu
+# Kutu Kapmaca - Flutter Mobil Oyunu
 
-Kutu Kapmaca, iki oyunculu klasik "Dots and Boxes" (Kutu Kapmaca) oyununun Flutter ile geliştirilmiş mobil/web uygulamasıdır. Oyuncular sırayla çizgiler çizer, kutuyu tamamlayan puan kazanır. Oyun sonunda kazanan renk ve skor ekranı otomatik olarak gösterilir.
+Kutu Kapmaca, iki oyuncu arasında oynanan, noktaları birleştirerek kutular oluşturma oyunudur. Amaç, tahtadaki en fazla kutuyu yapan oyuncu olmaktır.
 
 ## 🚀 Projenin Amacı
 
-Bu projenin temel amacı:
+Kutu Kapmaca oyunu projesi, kullanıcıların hem zihinsel becerilerini geliştirmelerine hem de eğlenceli ve rekabetçi bir oyun deneyimi yaşamalarına olanak tanımak amacıyla tasarlanmıştır. Bu proje, stratejik düşünme, dikkat toplama, öngörüde bulunma ve hızlı karar verme gibi bilişsel yetenekleri desteklemeyi hedefler. Oyuncular, oyunun temel dinamikleri olan sıra tabanlı hamle sistemi, kutu kapatma mantığı ve puanlama yapısı sayesinde, her hamlelerinde düşünerek hareket etmeye yönlendirilir. Böylece oyun, yalnızca rastgele tıklamalardan ibaret olmaktan çıkar ve kullanıcıyı düşünmeye teşvik eden bir yapıya kavuşur.
 
-* Firebase Authentication ile kullanıcı kimliği doğrulaması yapmak
-* Supabase kullanarak oyun skorlarını kaydetmek
-* Flutter ile sade ve kullanıcı dostu bir oyun arayüzü sunmak
 
-## 🔧 Kullanılan Teknolojiler
+## 🔧 Teknik Detaylar
 
-* **Flutter** – Arayüz ve oyun mantığı
-* **Firebase Authentication** – Giriş/Kayıt sistemi
-* **Firestore** – Kullanıcı bilgileri ve profil verisi
-* **Supabase** – Oyun skoru kaydı ("score": "12-8" formatında)
-* **SharedPreferences** – Yerel oturum bilgisi saklama
-* **animated\_text\_kit** – Giriş ekranında yazı animasyonu
-* **Provider** – Tema ve durum yönetimi
+* 🚀 Flutter
+Uygulamanın ana geliştirme platformudur. Tüm kullanıcı arayüzü, oyun mekaniği ve navigasyon yapısı Flutter ile oluşturulmuştur. Platformlar arası (mobil ve web) uyumluluk göz önünde bulundurularak tasarlanmıştır.
+
+* 🔐 Firebase Authentication
+Kullanıcıların e-posta/şifre, Google ve GitHub gibi yöntemlerle giriş yapabilmesi için kimlik doğrulama işlemleri Firebase altyapısı kullanılarak gerçekleştirilmiştir. Giriş yapılan kullanıcıya özel skorlar tutulur.
+
+* 🗄️ Supabase
+Oyun skorlarının saklandığı bulut tabanlı veritabanıdır. Her kullanıcının skoru bireysel olarak saklanır. Supabase üzerinden CRUD işlemleri gerçekleştirilmiş, sıralı skor listeleri oluşturulmuştur.
+
+* 🔗 Google Sign-In & GitHub Auth
+Üçüncü parti giriş seçenekleri olarak Google ve GitHub kimlik doğrulama sistemleri entegre edilmiştir. Firebase Authentication sistemi üzerinden kontrol edilir.
+
+* 🔄 State Management
+Uygulama durumu, Flutter’ın `setState()` yapısıyla yönetilmiştir. Oyun sırası, kutuların sahipliği ve skor durumu dinamik olarak güncellenmektedir. Ekstra state management kütüphaneleri kullanılmamıştır.
+
+* 📱 Responsive Tasarım
+Flutter’ın layout yapıları (Column, Row, Expanded, ListView) kullanılarak hem küçük ekranlı telefonlarda hem de büyük ekranlı cihazlarda düzgün görüntülenecek esnek bir yapı inşa edilmiştir.
+
+* 🗓️ Veri Formatlama
+`intl` paketi kullanılarak skorların oluşturulma tarihleri kullanıcı dostu bir formatta (`03.06.2025 14:30`) gösterilmiştir.
+
+---
+## 🧪 Kullanılan Teknolojiler
+
+| Teknoloji | Açıklama |
+|-----------|----------|
+| **Flutter** | Uygulamanın temel geliştirme platformudur. Hem mobil hem web desteği ile kullanılabilir yapıdadır. |
+| **Dart** | Flutter uygulamalarının geliştirilmesinde kullanılan programlama dilidir. |
+| **Firebase Authentication** | Kullanıcıların e-posta/şifre, Google ve GitHub hesaplarıyla güvenli giriş yapmasını sağlar. |
+| **Supabase** | Skorların saklandığı, PostgreSQL tabanlı bulut veritabanı çözümüdür. RESTful API üzerinden veri işlemleri yapılmıştır. |
+| **Google Sign-In** | Firebase üzerinden Google hesapları ile oturum açmayı sağlar (özellikle web sürümünde `client_id` ile çalışır). |
+| **GitHub Auth** | Firebase aracılığıyla GitHub hesapları ile kullanıcı doğrulaması yapılmasını sağlar. |
+| **intl** | Tarih ve saat formatlarını kullanıcıya uygun biçimde göstermek için kullanılmıştır. |
+| **Material Icons** | Oyun ekranında ikonlarla kullanıcıya görsel geri bildirim sağlamak için kullanılmıştır. |
+
+---
+
+
 
 ## 📃 Projedeki Sayfalar ve Görevleri
 
-### 🔐 LoginPage
+### 🔐 LoginPage (login_page.dart)
+* Kullanıcıların e-posta ve şifre ile giriş yaptığı ekrandır.
+* Firebase Authentication ile kimlik doğrulama yapılır.
+* Google ve GitHub ile sosyal giriş desteklenir.
+* Başarılı girişten sonra kullanıcı ana sayfaya yönlendirilir.
+* Giriş sonrası `Navigator.pushReplacement` ile `HomePage`'e geçiş yapılır.
+* Hatalar kullanıcıya Türkçe açıklamalarla gösterilir.
 
-* Kullanıcı giriş ekranıdır. Oyunun başlangıç noktadır.
-* Logo görseli ve animasyonlu "Kutu Kapmaca" yazısı içerir.
-* "Yeni Oyun" ve "Nasıl Oynanır" sayfalarına yönlendirme butonları bulunur.
+### 🧾 RegisterPage (register_page.dart)
+* Yeni kullanıcıların kayıt olmasını sağlayan sayfadır.
+* Firebase üzerinde e-posta ve şifre ile kullanıcı kaydı yapılır.
+* Giriş ekranına geri dönme ve şifreyi görünür yapma seçenekleri vardır.
+* `TextFormField` yapıları ile kullanıcıdan bilgi alınır ve doğrulama yapılır.
 
-### 🎮 GamePage
+### 🏠 HomePage (home_page.dart)
+* Uygulama içindeki merkezi ana ekrandır.
+* "Yeni Oyun", "Son Skorlar", "Nasıl Oynanır" ve "Profil" sayfalarına yönlendirme yapılır.
+* Üst bölümde kullanıcıya hoş geldin mesajı ve uygulama logosu yer alır.
+* Firebase’den oturum açmış kullanıcı bilgisi alınarak gösterilir.
 
+### 🎮 GamePage (game_page.dart)
 * Oyunun oynandığı ana sayfadır.
-* Oyuncular sırayla çizgi çeker, kutuları tamamlarsa puan kazanır.
-* Kazanan oyuncu otomatik olarak belirlenir ve skor görseli ekranın üstünde yazı olarak gösterilir.
-* Skor bilgisi Supabase'e "12-8" formatında kaydedilir.
+* 5x5 noktalı ızgarada oyuncular sırayla çizgi çeker.
+* Kutu kapanırsa ilgili oyuncuya puan yazılır.
+* Oyun sonunda kazanan otomatik belirlenir ve üstte yazıyla bildirilir.
+* Oyun skoru `"Mavi-Pembe"` formatında Supabase veritabanına kaydedilir.
+* "Oyunu Sıfırla" butonu ile yeni oyuna başlanabilir.
 
-### ❓ HowToPlayPage
+### 📊 ScoreListPage (score_list_page.dart)
+* Giriş yapan kullanıcıya ait tüm geçmiş skorları listeler.
+* Supabase veritabanından `score_text` ve `created_at` bilgisi çekilir.
+* Skorlar iki sütun halinde (Mavi Takım – Pembe Takım) olarak gösterilir.
+* Skorların tarihi kullanıcı dostu biçimde (`dd.MM.yyyy HH:mm`) biçimlendirilir.
 
-* Oyunun kuralları, mantığı ve kazanma koşulları açıklanır.
+### ❓ HowToPlayPage (how_to_play_page.dart)
+* Kutu Kapmaca oyununun kuralları ve oynanış mantığı anlatılır.
+* Kullanıcıya sade bir dille bilgilendirme yapılır.
+* Sayfa üzerinden oyunla ilgili bilgi edinilmesi amaçlanır.
 
-### ☰ AppDrawer
+### 🙋 ProfilePage (profile_page.dart)
+* Giriş yapan kullanıcıya ait profil bilgilerini görüntüler.
+* Firebase kullanıcı bilgileri çekilerek ekrana yansıtılır.
+* Kullanıcı e-postası, UID ve çıkış yap butonu yer alır.
+* "Çıkış Yap" butonuyla Firebase oturumu kapatılır ve login ekranına yönlendirme yapılır.
 
-* Uygulamadaki tüm sayfalara erişim sağlayan yan menüdür.
-* Logo, sayfa bağlantıları ve çıkış butonu içerir.
+### ☰ AppDrawer (app_drawer.dart)
+* Uygulama genelinde kullanılan navigasyon menüsüdür.
+* Drawer yapısıyla sol menüden diğer sayfalara geçiş yapılmasını sağlar.
+* Kullanıcı profili (logo) üstte gösterilir.
+* Menüde: "Kare Kapmaca", "Son Oyunlar", "Nasıl Oynanır", "Profil", "Çıkış Yap" gibi bağlantılar bulunur.
+* Firebase oturumu kapatıldığında `LoginPage`'e yönlendirme yapılır.
 
-## 🔖 Drawer Menüsü ve Logo
+### 🧩 supabase_service.dart
+* Supabase bağlantı işlemlerini yöneten yardımcı servistir.
+* Supabase istemcisi (`SupabaseClient`) burada yapılandırılır.
+* Projenin farklı yerlerinden Supabase veritabanına erişim bu dosya üzerinden sağlanır.
 
-* Kullanılan Logo URL'si: `https://i.imgur.com/1hwwXl0.png`
-* Logo, `FutureBuilder` ile yüklenir ve `Image.network` ile görüntülenir.
+### 🏁 main.dart
+* Uygulamanın başlangıç noktasıdır.
+* Firebase ve Supabase başlatmaları burada yapılır (`initializeApp`, `Supabase.initialize`).
+* Uygulama yönlendirme rotaları (`/login`, `/home`, `/game` vs.) burada tanımlanır.
+* İlk açılışta `LoginPage` veya `HomePage`'e yönlendirme yapılır.
 
-## 🔐 Login Bilgileri
 
-* Firebase Authentication kullanılmıştır.
-* Kullanıcı UID, ad, soyad, eposta `SharedPreferences` ile saklanır.
-* Sosyal giriş (Google ve GitHub) desteklenmektedir.
+### 🧱 BasePage (base_page.dart)
+
+* Uygulamadaki sayfalara ortak yapı sağlayan temel bir bileşendir.
+* Genellikle tüm sayfalarda tekrar eden `AppBar`, `Drawer` veya `SafeArea` gibi widget’ları tek noktada yönetmek için kullanılır.
+* Bu yapı sayesinde her yeni sayfa, `BasePage` üzerinden miras alınarak tutarlı görünüm elde eder.
+* Kod tekrarı azaltılır, genel düzen korunur.
+* `child` parametresiyle her sayfaya özgü içerik dinamik olarak yerleştirilebilir.
+
+### 🔧 FirebaseOptions (firebase_options.dart)
+
+* Firebase bağlantı ayarlarının otomatik olarak oluşturulduğu dosyadır.
+* `flutterfire configure` komutu ile oluşturulmuştur.
+* Firebase projesine ait `apiKey`, `projectId`, `messagingSenderId`, `appId` gibi hassas bilgileri içerir.
+* Uygulamanın Firebase’e bağlanabilmesi için `main.dart` dosyasında `Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)` satırıyla çağrılır.
+* Web, Android ve iOS platformları için ayrı ayrı yapılandırmalar içerir.
+
+
+
+---
+
 
 ## ☁️ Firestore ve Supabase Örnek Veri Yapıları
 
