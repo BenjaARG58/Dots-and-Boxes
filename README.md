@@ -141,7 +141,7 @@ Flutter’ın layout yapıları (Column, Row, Expanded, ListView) kullanılarak 
 
 ```json
 {
-  "uid": "7wdOfGpgBmtWF4N1Fmmuow3FwtBx1",
+  "uid": "aO0RDciUmCfbaGJpPhlVF92T0X22",
   "email": "hgencoglu@gmail.com",
   "birthdate": "01.01.1990",
   "birthplace": "Malatya",
