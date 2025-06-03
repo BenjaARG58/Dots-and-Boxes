@@ -1,9 +1,11 @@
+// Gerekli paketlerin içe aktarımı
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:intl/intl.dart';
-import 'app_drawer.dart';
+import 'package:intl/intl.dart'; // Tarih formatlama için
+import 'app_drawer.dart'; // Yan menü (Drawer) bileşeni
 
+/// Skor listesini gösteren sayfa
 class ScoreListPage extends StatefulWidget {
   const ScoreListPage({super.key});
 
@@ -12,27 +14,29 @@ class ScoreListPage extends StatefulWidget {
 }
 
 class _ScoreListPageState extends State<ScoreListPage> {
-  late final SupabaseClient supabase;
-  List<dynamic> scores = [];
-  bool isLoading = true;
-  String? errorMessage;
+  late final SupabaseClient supabase; // Supabase istemcisi
+  List<dynamic> scores = [];           // Skorları tutan liste
+  bool isLoading = true;              // Yükleniyor mu?
+  String? errorMessage;               // Hata mesajı varsa tutulur
 
   @override
   void initState() {
     super.initState();
-    supabase = Supabase.instance.client;
+    supabase = Supabase.instance.client; // Supabase bağlantısı alınır
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    fetchScores();
+    fetchScores(); // Widget yüklenince skorlar çekilir
   }
 
+  /// Supabase'den kullanıcının skor verilerini çeker
   Future<void> fetchScores() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
 
+      // Kullanıcı giriş yapmamışsa uyarı ver
       if (user == null) {
         setState(() {
           errorMessage = "Kullanıcı giriş yapmamış!";
@@ -41,6 +45,7 @@ class _ScoreListPageState extends State<ScoreListPage> {
         return;
       }
 
+      // Supabase'den kullanıcıya ait skorları al (tarihe göre sıralı)
       final response = await supabase
           .from('scores')
           .select('score_text, created_at')
@@ -52,6 +57,7 @@ class _ScoreListPageState extends State<ScoreListPage> {
         isLoading = false;
       });
     } catch (e) {
+      // Hata durumunda mesaj göster
       setState(() {
         errorMessage = "Veriler alınırken hata oluştu: $e";
         isLoading = false;
@@ -68,14 +74,19 @@ class _ScoreListPageState extends State<ScoreListPage> {
         title: const Text('Skorlarım', style: TextStyle(color: Colors.white)),
         elevation: 1,
       ),
-      drawer: const AppDrawer(),
+      drawer: const AppDrawer(), // Yan menü bileşeni
       backgroundColor: Colors.black,
+
+      // İçerik: Yükleniyorsa spinner, hata varsa mesaj, veri varsa liste
       body: isLoading
           ? const Center(child: CircularProgressIndicator(color: Colors.white))
           : errorMessage != null
           ? Center(
-          child: Text(errorMessage!,
-              style: const TextStyle(color: Colors.white)))
+        child: Text(
+          errorMessage!,
+          style: const TextStyle(color: Colors.white),
+        ),
+      )
           : scores.isEmpty
           ? const Center(
         child: Text("Henüz skor yok.",
@@ -91,10 +102,13 @@ class _ScoreListPageState extends State<ScoreListPage> {
           DateFormat('dd.MM.yyyy HH:mm').format(date);
 
           final scoreText = score['score_text'] as String;
+
+          // Skor formatı: "5-3" gibi (mavi-pembe)
           final parts = scoreText.split('-');
           final blue = parts.length > 0 ? parts[0] : '?';
           final pink = parts.length > 1 ? parts[1] : '?';
 
+          // Skor kartı
           return Card(
             color: Colors.grey[900],
             elevation: 3,
@@ -110,6 +124,7 @@ class _ScoreListPageState extends State<ScoreListPage> {
                 children: [
                   Row(
                     children: [
+                      // Mavi Takım
                       Expanded(
                         child: Column(
                           children: [
@@ -133,6 +148,8 @@ class _ScoreListPageState extends State<ScoreListPage> {
                         ),
                       ),
                       const SizedBox(width: 8),
+
+                      // Pembe Takım
                       Expanded(
                         child: Column(
                           children: [
@@ -157,7 +174,10 @@ class _ScoreListPageState extends State<ScoreListPage> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 8),
+
+                  // Skorun tarihi
                   Text(
                     'Tarih: $formattedDate',
                     textAlign: TextAlign.center,

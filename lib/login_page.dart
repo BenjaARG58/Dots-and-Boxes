@@ -4,7 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'register_page.dart';
 import 'home_page.dart';
 
-// Hata mesajlarını Türkçeleştiren fonksiyon
+/// Firebase hata kodlarını Türkçe mesajlara çeviren fonksiyon
 String firebaseErrorToTurkish(String code) {
   switch (code) {
     case 'invalid-email':
@@ -28,21 +28,24 @@ String firebaseErrorToTurkish(String code) {
   }
 }
 
-
-// Google ile Giriş Fonksiyonu
+/// Google hesabıyla giriş yapan fonksiyon
 Future<UserCredential?> signInWithGoogle() async {
   try {
+    // Kullanıcıdan Google hesabı seçmesini ister
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-    if (googleUser == null) return null;
+    if (googleUser == null) return null; // İşlem iptal edilirse null döner
 
+    // Kimlik doğrulama bilgileri alınır
     final GoogleSignInAuthentication googleAuth =
     await googleUser.authentication;
 
+    // Google kimlik bilgileri Firebase için hazırlanır
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
 
+    // Firebase'e kimlik bilgileri ile giriş yapılır
     return await FirebaseAuth.instance.signInWithCredential(credential);
   } catch (e) {
     print('Google Giriş Hatası: $e');
@@ -50,7 +53,7 @@ Future<UserCredential?> signInWithGoogle() async {
   }
 }
 
-// GitHub ile Giriş Fonksiyonu
+/// GitHub ile giriş yapan fonksiyon
 Future<UserCredential?> signInWithGitHub() async {
   try {
     GithubAuthProvider githubProvider = GithubAuthProvider();
@@ -61,6 +64,7 @@ Future<UserCredential?> signInWithGitHub() async {
   }
 }
 
+/// Login ekranı bileşeni
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -69,13 +73,18 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  // Kullanıcının e-posta ve şifresi için controller
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
+  // Firebase kimlik doğrulama nesnesi
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // Yükleniyor mu ve hata mesajı
   bool isLoading = false;
   String errorMessage = '';
 
+  /// Kullanıcı e-posta ve şifre ile giriş yapar
   Future<void> loginUser() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -90,14 +99,15 @@ class _LoginPageState extends State<LoginPage> {
         email: email,
         password: password,
       );
+      // Başarılı giriş sonrası ana sayfaya yönlendirme
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
     } on FirebaseAuthException catch (e) {
+      // Hata varsa Türkçeye çevirerek ekrana göster
       setState(() {
         errorMessage = firebaseErrorToTurkish(e.code);
-
       });
     } finally {
       setState(() {
@@ -106,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  /// Arayüz bileşeni (UI)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,6 +129,7 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // Sayfa başlığı
                   Text(
                     'Giriş Yap',
                     style: TextStyle(
@@ -125,13 +137,11 @@ class _LoginPageState extends State<LoginPage> {
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                     ),
-
                   ),
-
                   const SizedBox(height: 40),
 
+                  // E-posta giriş alanı
                   TextField(
-
                     controller: emailController,
                     style: TextStyle(color: Colors.white),
                     decoration: InputDecoration(
@@ -147,6 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 20),
 
+                  // Şifre giriş alanı
                   TextField(
                     controller: passwordController,
                     obscureText: true,
@@ -164,6 +175,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 20),
 
+                  // Hata mesajı gösterimi
                   if (errorMessage.isNotEmpty)
                     Text(
                       errorMessage,
@@ -172,6 +184,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 20),
 
+                  // Giriş butonu veya yükleniyor göstergesi
                   isLoading
                       ? CircularProgressIndicator()
                       : ElevatedButton(
@@ -190,10 +203,9 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
 
-
-                  const SizedBox(height: 16),
                   const SizedBox(height: 16),
 
+                  // Ayraç çizgiler
                   Row(
                     children: [
                       Expanded(
@@ -217,10 +229,9 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-
                   const SizedBox(height: 16),
 
-
+                  // Google ile giriş butonu
                   OutlinedButton.icon(
                     icon: Icon(Icons.g_mobiledata, color: Colors.red),
                     label: Text(
@@ -245,6 +256,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 12),
 
+                  // GitHub ile giriş butonu
                   OutlinedButton.icon(
                     icon: Icon(Icons.code, color: Colors.white),
                     label: Text(
@@ -269,6 +281,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const SizedBox(height: 30),
 
+                  // Kayıt olma yönlendirmesi
                   TextButton(
                     onPressed: () {
                       Navigator.push(

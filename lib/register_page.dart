@@ -1,3 +1,4 @@
+// Gerekli paketlerin içe aktarımı
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 
-// Hata mesajlarını Türkçeleştirme
+/// Firebase hata mesajlarını Türkçeleştiren yardımcı fonksiyon
 String firebaseErrorToTurkish(String code) {
   switch (code) {
     case 'invalid-email': return 'Geçersiz e-posta adresi.';
@@ -21,16 +22,19 @@ String firebaseErrorToTurkish(String code) {
   }
 }
 
+/// Google hesabıyla giriş yapan fonksiyon
 Future<UserCredential?> signInWithGoogle() async {
   try {
     final googleUser = await GoogleSignIn().signIn();
     if (googleUser == null) return null;
 
     final googleAuth = await googleUser.authentication;
+
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
+
     return await FirebaseAuth.instance.signInWithCredential(credential);
   } catch (e) {
     print('Google Giriş Hatası: $e');
@@ -38,6 +42,7 @@ Future<UserCredential?> signInWithGoogle() async {
   }
 }
 
+/// GitHub hesabıyla giriş yapan fonksiyon
 Future<UserCredential?> signInWithGitHub() async {
   try {
     GithubAuthProvider githubProvider = GithubAuthProvider();
@@ -48,6 +53,7 @@ Future<UserCredential?> signInWithGitHub() async {
   }
 }
 
+/// Kayıt ekranı
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
@@ -56,16 +62,20 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  // Form verilerini tutmak için controller’lar
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final birthdateController = TextEditingController();
   final birthplaceController = TextEditingController();
   final cityController = TextEditingController();
 
+  // Firebase kimlik doğrulama nesnesi
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  bool isLoading = false;
-  String errorMessage = '';
 
+  bool isLoading = false;         // Yükleme durumu
+  String errorMessage = '';       // Hata mesajı
+
+  /// Kullanıcıyı e-posta/şifre ile kaydeden fonksiyon
   Future<void> registerUser() async {
     final email = emailController.text.trim();
     final password = passwordController.text;
@@ -79,11 +89,13 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
+      // Firebase Authentication ile kullanıcı oluşturulur
       final userCred = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
+      // Firestore veritabanına ek bilgiler kaydedilir
       await FirebaseFirestore.instance.collection('users').doc(userCred.user!.uid).set({
         'email': email,
         'birthdate': birthdate,
@@ -92,7 +104,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'createdAt': Timestamp.now(),
       });
 
-      // SharedPreferences'a kaydetme
+      // SharedPreferences ile kullanıcı bilgileri yerel olarak saklanır
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('uid', userCred.user!.uid);
       await prefs.setString('email', email);
@@ -100,17 +112,20 @@ class _RegisterPageState extends State<RegisterPage> {
       await prefs.setString('birthplace', birthplace);
       await prefs.setString('city', city);
 
+      // Başarılı kayıt sonrası ana sayfaya yönlendirme
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const HomePage()),
       );
     } on FirebaseAuthException catch (e) {
+      // Hata olursa kullanıcıya mesaj gösterilir
       setState(() => errorMessage = firebaseErrorToTurkish(e.code));
     } finally {
       setState(() => isLoading = false);
     }
   }
 
+  /// Google/GitHub gibi sosyal giriş butonları için ortak işlev
   void handleSocialLogin(Future<UserCredential?> Function() loginMethod) async {
     final userCred = await loginMethod();
     if (userCred != null) {
@@ -121,6 +136,7 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  /// Ortak stil için form alanı widget’ı
   Widget buildTextField({required TextEditingController controller, required String label, bool obscure = false}) {
     return TextField(
       controller: controller,
@@ -135,6 +151,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  /// Arayüz
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -145,8 +162,11 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Column(
             children: [
               const SizedBox(height: 40),
-              const Text('Kıyat Ol', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+              const Text('Kıyat Ol', // burada "Kayıt Ol" olmalı
+                  style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
               const SizedBox(height: 30),
+
+              // Form alanları
               buildTextField(controller: emailController, label: 'E-posta'),
               const SizedBox(height: 15),
               buildTextField(controller: passwordController, label: 'Şifre', obscure: true),
@@ -156,10 +176,16 @@ class _RegisterPageState extends State<RegisterPage> {
               buildTextField(controller: birthplaceController, label: 'Doğum Yeri'),
               const SizedBox(height: 15),
               buildTextField(controller: cityController, label: 'Yaşadığı İl'),
+
               const SizedBox(height: 20),
+
+              // Hata varsa ekranda göster
               if (errorMessage.isNotEmpty)
                 Text(errorMessage, style: const TextStyle(color: Colors.redAccent)),
+
               const SizedBox(height: 20),
+
+              // Kayıt butonu ya da yükleme göstergesi
               isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
@@ -170,9 +196,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text('Kıyat Ol', style: TextStyle(color: Colors.white, fontSize: 16)),
+                child: const Text('Kıyat Ol', // burada da "Kayıt Ol" olmalı
+                    style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
+
               const SizedBox(height: 30),
+
+              // "veya" ayıracı
               Row(
                 children: const [
                   Expanded(child: Divider(color: Colors.white24)),
@@ -183,7 +213,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   Expanded(child: Divider(color: Colors.white24)),
                 ],
               ),
+
               const SizedBox(height: 30),
+
+              // Google ile kayıt
               OutlinedButton.icon(
                 icon: const Icon(Icons.g_mobiledata, color: Colors.red),
                 label: const Text('Google ile Kıyat Ol', style: TextStyle(color: Colors.white)),
@@ -195,7 +228,10 @@ class _RegisterPageState extends State<RegisterPage> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
+
               const SizedBox(height: 12),
+
+              // GitHub ile kayıt
               OutlinedButton.icon(
                 icon: const Icon(Icons.code, color: Colors.white),
                 label: const Text('GitHub ile Kıyat Ol', style: TextStyle(color: Colors.white)),
@@ -207,6 +243,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
+
+              // Girişe yönlendirme
               TextButton(
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Zaten hesabın var mı? Giriş Yap', style: TextStyle(color: Colors.white38)),

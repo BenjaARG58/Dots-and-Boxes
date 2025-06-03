@@ -5,36 +5,39 @@ class HowToPlayPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      drawer: AppDrawer(),
+      backgroundColor: Colors.black, // Arka plan rengi siyah
+      drawer: AppDrawer(), // Sol menü çekmecesi
       body: SafeArea(
+        // Güvenli bölge içinde içerik oluşturuluyor
         child: Column(
           children: [
+            // Üst başlık ve menü simgesi
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
                 children: [
                   Builder(
                     builder: (context) => IconButton(
-                      icon: Icon(Icons.menu, color: Colors.white),
-                      onPressed: () => Scaffold.of(context).openDrawer(),
+                      icon: Icon(Icons.menu, color: Colors.white), // Menü ikonu
+                      onPressed: () => Scaffold.of(context).openDrawer(), // Menüyü açar
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 8), // İkon ile metin arası boşluk
                   Expanded(
                     child: Text(
-                      'Nasıl Oynanır?',
+                      'Nasıl Oynanır?', // Başlık
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors.lightBlueAccent,
                       ),
-                      textAlign: TextAlign.center,
+                      textAlign: TextAlign.center, // Ortalanmış metin
                     ),
                   ),
                 ],
               ),
             ),
+            // Açıklamaların yer aldığı scroll alanı
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -46,10 +49,10 @@ class HowToPlayPage extends StatelessWidget {
                     _buildStep("🧠 Strateji", "Bir kutunun dört kenarı kapandığında kutu kapanır ve son çizen oyuncuya puan kazandırır."),
                     _buildStep("💥 Devam", "Kutu kapanırsa oyuncu tekrar oynar."),
                     _buildStep("🏁 Bitiş", "Tüm kutular kapanınca oyun biter, en çok kutuya sahip oyuncu kazanır."),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 20), // Boşluk
                     Center(
                       child: Text(
-                        "İyi şanslar!",
+                        "İyi şanslar!", // Motivasyon mesajı
                         style: TextStyle(
                           color: Colors.pinkAccent,
                           fontSize: 20,
@@ -67,6 +70,7 @@ class HowToPlayPage extends StatelessWidget {
     );
   }
 
+  // Her bir adımı oluşturan yardımcı fonksiyon
   Widget _buildStep(String title, String desc) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -74,16 +78,16 @@ class HowToPlayPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            title,
+            title, // Başlık kısmı
             style: TextStyle(
               color: Colors.lightBlueAccent,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 6), // Başlık ile açıklama arası boşluk
           Text(
-            desc,
+            desc, // Açıklama metni
             style: TextStyle(color: Colors.white, fontSize: 16),
           ),
         ],

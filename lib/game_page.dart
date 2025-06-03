@@ -1,23 +1,26 @@
+// Gerekli Flutter ve Firebase/Supabase paketleri import edilir
 import 'package:flutter/material.dart';
-import 'app_drawer.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'app_drawer.dart'; // Uygulamanın navigasyon menüsünü içeren dosya
+import 'package:supabase_flutter/supabase_flutter.dart'; // Supabase veritabanı işlemleri için
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase kimlik doğrulama
 
+// GamePage sayfası - oyunun oynandığı ana ekran
 class GamePage extends StatefulWidget {
   @override
   State<GamePage> createState() => _GamePageState();
 }
 
 class _GamePageState extends State<GamePage> {
-  final int gridSize = 5;
+  final int gridSize = 5; // Oyun 5x5 noktadan oluşur
 
-  late List<List<int?>> horizontalLines;
-  late List<List<int?>> verticalLines;
-  late List<List<int?>> boxes;
+  late List<List<int?>> horizontalLines; // Yatay çizgilerin sahiplik durumu
+  late List<List<int?>> verticalLines;   // Dikey çizgilerin sahiplik durumu
+  late List<List<int?>> boxes;           // Kutu sahiplikleri (0 veya 1)
 
-  int currentPlayer = 0;
-  List<int> scores = [0, 0];
+  int currentPlayer = 0; // O anki oyuncu (0 = Mavi, 1 = Pembe)
+  List<int> scores = [0, 0]; // Oyuncuların skorları
 
+  // Renk tanımlamaları
   final playerColors = [Colors.lightBlueAccent, Colors.pinkAccent];
   final backgroundColor = Colors.black;
   final emptyLineColor = Colors.grey.shade900;
@@ -29,10 +32,11 @@ class _GamePageState extends State<GamePage> {
   @override
   void initState() {
     super.initState();
-    _initializeGame();
+    _initializeGame(); // Oyun durumu sıfırlanır
   }
 
   void _initializeGame() {
+    // Tüm çizgi ve kutular sıfırlanır
     horizontalLines = List.generate(gridSize, (_) => List.filled(gridSize - 1, null));
     verticalLines = List.generate(gridSize - 1, (_) => List.filled(gridSize, null));
     boxes = List.generate(gridSize - 1, (_) => List.filled(gridSize - 1, null));
@@ -41,6 +45,7 @@ class _GamePageState extends State<GamePage> {
   }
 
   bool isGameOver() {
+    // Tüm kutular doldurulduysa oyun biter
     for (var row in boxes) {
       for (var box in row) {
         if (box == null) return false;
@@ -49,6 +54,7 @@ class _GamePageState extends State<GamePage> {
     return true;
   }
 
+  // Supabase'e skor kaydeder
   void saveScoreToSupabase(String scoreText) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -66,8 +72,10 @@ class _GamePageState extends State<GamePage> {
     }
   }
 
+  // Bir çizgi çizildiğinde çalışır
   void drawLine({required bool isHorizontal, required int row, required int col}) {
     setState(() {
+      // Eğer çizgi zaten çizilmişse hiçbir şey yapma
       if (isHorizontal) {
         if (horizontalLines[row][col] != null) return;
         horizontalLines[row][col] = currentPlayer;
@@ -78,6 +86,7 @@ class _GamePageState extends State<GamePage> {
 
       bool claimedBox = false;
 
+      // Her kutu kontrol edilir, dört çizgisi varsa sahip atanır
       for (int r = 0; r < gridSize - 1; r++) {
         for (int c = 0; c < gridSize - 1; c++) {
           if (boxes[r][c] != null) continue;
@@ -95,25 +104,24 @@ class _GamePageState extends State<GamePage> {
         }
       }
 
+      // Eğer kutu kapılmadıysa sıra değişir
       if (!claimedBox) currentPlayer = 1 - currentPlayer;
 
+      // Oyun biterse skor verisi Supabase'e kaydedilir
       if (isGameOver()) {
-        String scoreText = "${scores[0]}-${scores[1]}";
+        String scoreText = "\${scores[0]}-\${scores[1]}";
         saveScoreToSupabase(scoreText);
       }
     });
   }
 
+  // Nokta (dot) widget'ı
   Widget buildDot() {
     Color color = dotColor;
     if (isGameOver()) {
-      if (scores[0] > scores[1]) {
-        color = playerColors[0];
-      } else if (scores[1] > scores[0]) {
-        color = playerColors[1];
-      }
+      if (scores[0] > scores[1]) color = playerColors[0];
+      else if (scores[1] > scores[0]) color = playerColors[1];
     }
-
     return Container(
       width: lineThickness,
       height: lineThickness,
@@ -121,6 +129,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Yatay çizgi oluşturur
   Widget buildHorizontalLine(int r, int c) {
     final owner = horizontalLines[r][c];
     return GestureDetector(
@@ -136,6 +145,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Dikey çizgi oluşturur
   Widget buildVerticalLine(int r, int c) {
     final owner = verticalLines[r][c];
     return GestureDetector(
@@ -151,11 +161,10 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Kutu (box) rengi atanır
   Widget buildBox(int r, int c) {
     final owner = boxes[r][c];
-    final color = owner == null
-        ? Colors.transparent
-        : playerColors[owner].withOpacity(0.4);
+    final color = owner == null ? Colors.transparent : playerColors[owner].withOpacity(0.4);
     return Container(
       width: lineLength,
       height: lineLength,
@@ -163,6 +172,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Skor kartları (Mavi vs Pembe)
   Widget _buildScoreCard({required int player, required String label, required int score}) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -195,6 +205,7 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
+  // Arayüzün oluşturulduğu ana bölüm
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -203,6 +214,7 @@ class _GamePageState extends State<GamePage> {
       body: SafeArea(
         child: Column(
           children: [
+            // Üst başlık ve menü butonu
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: Row(
@@ -233,7 +245,8 @@ class _GamePageState extends State<GamePage> {
                 ],
               ),
             ),
-            const SizedBox(height: 6),
+
+            // Kazanan mesajı ya da kimin sırası olduğu
             isGameOver()
                 ? Text(
               scores[0] > scores[1]
@@ -266,28 +279,30 @@ class _GamePageState extends State<GamePage> {
                 ],
               ),
             ),
+
             const SizedBox(height: 24),
+
+            // Skor kartı (Mavi vs Pembe)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildScoreCard(player: 0, label: "Mavi", score: scores[0]),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(
-                    'vs',
-                    style: TextStyle(color: Colors.white70, fontSize: 18),
-                  ),
+                  child: Text('vs', style: TextStyle(color: Colors.white70, fontSize: 18)),
                 ),
                 _buildScoreCard(player: 1, label: "Pembe", score: scores[1]),
               ],
             ),
+
             const SizedBox(height: 16),
+
+            // Oyun ızgarası (çizgiler, kutular, noktalar)
             Center(
               child: Container(
                 padding: const EdgeInsets.all(8),
                 color: backgroundColor,
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: List.generate(gridSize * 2 - 1, (i) {
                     return Row(
                       mainAxisSize: MainAxisSize.min,
@@ -302,7 +317,10 @@ class _GamePageState extends State<GamePage> {
                 ),
               ),
             ),
+
             const SizedBox(height: 16),
+
+            // Sıfırla butonu
             ElevatedButton(
               onPressed: () => setState(() => _initializeGame()),
               style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade800),
