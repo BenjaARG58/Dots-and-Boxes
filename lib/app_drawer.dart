@@ -8,6 +8,7 @@ class AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+
       backgroundColor: Colors.grey[900],
       child: Column(
         children: [
@@ -50,16 +51,24 @@ class AppDrawer extends StatelessWidget {
                 ),
                 _buildDrawerItem(
                   context,
+                  icon: Icons.person,
+                  label: 'Son Oyunlar',
+                  route: '/scorelist',
+                ),
+                _buildDrawerItem(
+                  context,
                   icon: Icons.lightbulb_outline,
                   label: 'Nasıl Oynanır',
                   route: '/howtoplay',
                 ),
+
                 _buildDrawerItem(
                   context,
                   icon: Icons.person,
                   label: 'Profil',
                   route: '/profile',
                 ),
+
               ],
             ),
           ),

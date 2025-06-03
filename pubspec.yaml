@@ -39,6 +39,7 @@ dependencies:
   cloud_firestore: ^4.9.1
   shared_preferences: ^2.2.2
   supabase_flutter: ^1.10.17
+  intl: ^0.18.1
   font_awesome_flutter: ^10.6.0
 
 

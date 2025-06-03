@@ -3,6 +3,7 @@ import 'login_page.dart' as login;
 import 'home_page.dart' as home;
 import 'game_page.dart' as game;
 import 'profile_page.dart' as profile;
+import 'package:untitled/ScoreListPage.dart' as score;
 import 'how_to_play_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -48,6 +49,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => login.LoginPage(),
         '/home': (context) => home.HomePage(),
+        '/scorelist': (context) => score.ScoreListPage(),
         '/profile': (context) => profile.ProfilePage(),
         '/game': (context) => game.GamePage(),
         '/howtoplay': (context) => HowToPlayPage(),

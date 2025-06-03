@@ -98,7 +98,7 @@ class _GamePageState extends State<GamePage> {
       if (!claimedBox) currentPlayer = 1 - currentPlayer;
 
       if (isGameOver()) {
-        String scoreText = "\${scores[0]}-\${scores[1]}";
+        String scoreText = "${scores[0]}-${scores[1]}";
         saveScoreToSupabase(scoreText);
       }
     });
