@@ -1,4 +1,4 @@
-# Kutu Kapmaca - Flutter Mobil Oyunu
+# Dots and Boxes(Kutu Kapmaca) - Flutter Mobil Oyunu
 
 Kutu Kapmaca, iki oyuncu arasında oynanan, noktaları birleştirerek kutular oluşturma oyunudur. Amaç, tahtadaki en fazla kutuyu yapan oyuncu olmaktır.
 
